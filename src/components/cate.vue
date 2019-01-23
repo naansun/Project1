@@ -55,7 +55,8 @@ export default {
       arr: [],
       websock: null,
       arr1: [],
-      listId: ["4"]
+      default: "",
+      listId: []
     };
   },
   methods: {
@@ -73,7 +74,9 @@ export default {
           Authorization: localStorage.getItem("token")
         },
         success: info => {
-          console.log(info.data[0]);
+          this.default = info.data[0].listPageData[0].id;
+          this.listId.push(info.data[0].listPageData[0].id.toString());
+          this.websocketonopen(event);
           this.total = info.data[0].totalErrorCount;
           this.arr = info.data[0].listPageData;
         }
@@ -81,7 +84,9 @@ export default {
     },
     initWebSocket(id) {
       //初始化weosocket
-      const wsuri = "ws://192.168.31.126:8887/websocket/categoryPage/" + id;
+      let token = localStorage.getItem("token");
+      const wsuri =
+        "ws://192.168.31.126:8887/websocket/categoryPage/" + id + "/" + token;
       this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       this.websock.onopen = this.websocketonopen;
@@ -91,7 +96,7 @@ export default {
     websocketonopen(event) {
       console.log("连接成功~");
       var param = {};
-      param.deviceId = "4";
+      param.deviceId = this.listId[0];
       var jsonStr = JSON.stringify(param);
       this.websocketsend(jsonStr);
     },
@@ -117,7 +122,7 @@ export default {
       } else {
         console.log("目前没有实时数据");
       }
-      console.log(this.arr1);
+      // console.log(this.arr1);
     },
     websocketsend(Data) {
       //数据发送
@@ -130,6 +135,8 @@ export default {
     // 点击事件
     fn(e) {
       let id = $(e.currentTarget).attr("id");
+      // console.log(id);
+
       if (this.listId.indexOf(id) != -1) {
         return;
       } else {
