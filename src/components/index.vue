@@ -33,6 +33,7 @@
 
 <script>
 export default {
+  // 数据部分
   data() {
     return {
       user: {
@@ -52,6 +53,7 @@ export default {
       contentType: "application/json; charset=UTF-8",
       data: JSON.stringify(this.user),
       success: function(info) {
+        // 将token存到本地的localStorage中保存
         localStorage.setItem("token", info.data);
       }
     });
@@ -123,7 +125,6 @@ a:hover {
   text-decoration: none;
   color: #21252f;
 }
-
 .total {
   float: right;
   width: 200px;

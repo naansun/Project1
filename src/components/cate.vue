@@ -64,7 +64,7 @@ export default {
     getId() {
       return location.hash.split("?")[1].split("=")[1];
     },
-    // ajax渲染列表内容
+    // ajax渲染侧边栏列表内容
     render(id) {
       $.ajax({
         url: "http://192.168.31.126:8887/category/getCategoryById/" + id + "",
@@ -82,6 +82,7 @@ export default {
         }
       });
     },
+    // webSocket初始化
     initWebSocket(id) {
       //初始化weosocket
       let token = localStorage.getItem("token");
@@ -93,6 +94,7 @@ export default {
       this.websock.onerror = this.websocketonerror;
       this.websock.onclose = this.websocketclose;
     },
+    // 建立webSocket连接
     websocketonopen(event) {
       console.log("连接成功~");
       var param = {};
@@ -100,10 +102,12 @@ export default {
       var jsonStr = JSON.stringify(param);
       this.websocketsend(jsonStr);
     },
+    // webSocket建立连接发生错误时
     websocketonerror() {
       //连接建立失败重连
       console.log("连接错误~");
     },
+    // webSocket接收到消息时
     websocketonmessage(e) {
       //数据接收
       let redata = JSON.parse(e.data);
@@ -124,15 +128,17 @@ export default {
       }
       // console.log(this.arr1);
     },
+    // webSocket发送数据时
     websocketsend(Data) {
       //数据发送
       this.websock.send(Data);
     },
+    // wenSocket连接关闭时
     websocketclose() {
       //关闭
       console.log("断开连接");
     },
-    // 点击事件
+    // 侧边栏设备(如空调一)点击事件
     fn(e) {
       let id = $(e.currentTarget).attr("id");
       // console.log(id);
@@ -144,6 +150,7 @@ export default {
         // console.log(this.listId);
       }
     },
+    // 发送设备id传给后台(webSocket)
     clickSend(id) {
       var param = {};
       param.deviceId = id;
@@ -151,12 +158,14 @@ export default {
       this.websocketsend(jsonStr);
       this.listId.push(id);
     },
+    // 关闭情况发送给后台(webSocket)
     clickClose(id) {
       var param = {};
       param.removeDeviceId = id;
       var jsonStr = JSON.stringify(param);
       this.websocketsend(jsonStr);
     },
+    // 具体设备关闭时
     close(e) {
       let p = $(e.currentTarget)
         .parent()
@@ -182,11 +191,13 @@ export default {
       this.clickClose(id);
     }
   },
+  // 钩子函数   处理ajax渲染
   created() {
     let id = this.getId();
     this.render(id);
     this.initWebSocket(id);
   },
+  //路由关闭时
   destroyed() {
     this.websock.close(); //离开路由之后断开websocket连接
   }
